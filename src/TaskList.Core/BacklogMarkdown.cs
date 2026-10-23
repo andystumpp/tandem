@@ -8,13 +8,13 @@ namespace TaskList.Core;
 /// <code>
 /// # Tasks
 ///
-/// - [ ] Call the dentist
-/// - [ ] [P:1] Plan the weekend trip
+/// - [ ] Fix the flaky login test
+/// - [ ] [P:1] Ship the 1.2 release
 ///
-/// ## [Active:true, P:1, Size:M] Home Garden
-/// [Outcome]: Grow our own vegetables by summer
-/// - [ ] [Research:true] Compare raised bed kits
-/// - [x] Buy seeds
+/// ## [Active:true, P:1, Size:M] API Performance
+/// [Outcome]: p95 latency under 200 ms on every endpoint
+/// - [ ] [Research:true] Compare Redis and Memcached for caching
+/// - [x] Add request tracing
 /// </code>
 /// Tasks before the first "##" are standalone Focus tasks. Attribute blocks are optional and unknown keys
 /// are kept. Lines that don't fit are reported with their line number, and the file is then left alone.
@@ -191,7 +191,7 @@ public static partial class BacklogMarkdown
 
         ## [Active:true, P:2, Size:S] Health
         [Outcome]: Run a half marathon by April
-        - [ ] Book a physio session
+        - [ ] Rotate the API keys
         - [x] Buy running shoes
 
         ## [Active:false] Side projects

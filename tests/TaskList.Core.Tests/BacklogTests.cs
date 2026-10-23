@@ -7,14 +7,14 @@ public class BacklogMarkdownTests
     private const string Sample = """
         # Tasks
 
-        - [ ] Call the dentist
-        - [x] [P:1] Plan the weekend trip
+        - [ ] Fix the flaky login test
+        - [x] [P:1] Ship the 1.2 release
           - a note
 
-        ## [Active:true, P:1, Size:M] Home Garden
-        [Outcome]: Grow our own vegetables by summer
-        - [ ] [P:2, Research:true] Compare raised bed kits
-        - [x] Buy seeds
+        ## [Active:true, P:1, Size:M] API Performance
+        [Outcome]: p95 latency under 200 ms on every endpoint
+        - [ ] [P:2, Research:true] Compare Redis and Memcached for caching
+        - [x] Add request tracing
         - [ ] [WIP] not attributes
 
         ## [Active:false, Owner:me] Side projects
@@ -35,11 +35,11 @@ public class BacklogMarkdownTests
         Assert.Single(doc.Focus[1].NoteLines);
 
         var area = doc.Areas[0];
-        Assert.Equal("Home Garden", area.Title);
+        Assert.Equal("API Performance", area.Title);
         Assert.True(area.Active);
         Assert.Equal(1, area.Priority);
         Assert.Equal("M", area.Attributes.Get("Size"));
-        Assert.Equal("Grow our own vegetables by summer", area.Outcome);
+        Assert.Equal("p95 latency under 200 ms on every endpoint", area.Outcome);
         Assert.True(area.Tasks[0].WantsResearch);
         Assert.Equal("[WIP] not attributes", area.Tasks[2].Text);
 
@@ -173,22 +173,22 @@ public class BacklogStoreTests : IDisposable
 public class ResearchHeuristicsTests
 {
     [Theory]
-    [InlineData("Which CRM should we use for the pilot?", true)]
-    [InlineData("Compare raised bed kits", true)]
-    [InlineData("Find out how composting works", true)]
-    [InlineData("How do I know whether my soil is acidic", true)]
-    [InlineData("Look into drip irrigation", true)]
-    [InlineData("Book a physio session", false)]
-    [InlineData("Call the dentist", false)]
-    [InlineData("Pay invoice", false)]
+    [InlineData("Which logging library should we use for the service?", true)]
+    [InlineData("Compare Redis and Memcached for caching", true)]
+    [InlineData("Find out how connection pooling works", true)]
+    [InlineData("How do I know whether a query uses the index", true)]
+    [InlineData("Look into HTTP/3 support", true)]
+    [InlineData("Rotate the API keys", false)]
+    [InlineData("Fix the flaky login test", false)]
+    [InlineData("Bump version", false)]
     public void Detects_research_style_tasks(string text, bool expected) =>
         Assert.Equal(expected, ResearchHeuristics.ShouldResearch(new TaskItem(text)));
 
     [Fact]
     public void Explicit_attribute_wins()
     {
-        Assert.True(ResearchHeuristics.ShouldResearch(BacklogMarkdown.ParseTask("[Research:true] Book a physio session")));
-        Assert.False(ResearchHeuristics.ShouldResearch(BacklogMarkdown.ParseTask("[Research:false] Which CRM should we use?")));
+        Assert.True(ResearchHeuristics.ShouldResearch(BacklogMarkdown.ParseTask("[Research:true] Rotate the API keys")));
+        Assert.False(ResearchHeuristics.ShouldResearch(BacklogMarkdown.ParseTask("[Research:false] Which logging library should we use?")));
     }
 }
 
@@ -258,12 +258,12 @@ public class OwnerTests
     [Fact]
     public void Owner_round_trips_in_the_file()
     {
-        var doc = BacklogMarkdown.Parse("- [ ] [Owner:Alex Kim] Review the deck\n");
+        var doc = BacklogMarkdown.Parse("- [ ] [Owner:Alex Kim] Review the PR\n");
         Assert.Equal("Alex Kim", doc.Focus[0].Owner);
         doc.Focus[0].Owner = null;
-        Assert.Equal("- [ ] Review the deck\n", BacklogMarkdown.Serialize(doc));
+        Assert.Equal("- [ ] Review the PR\n", BacklogMarkdown.Serialize(doc));
         doc.Focus[0].Owner = "Sam";
-        Assert.Contains("[Owner:Sam] Review the deck", BacklogMarkdown.Serialize(doc));
+        Assert.Contains("[Owner:Sam] Review the PR", BacklogMarkdown.Serialize(doc));
     }
 }
 

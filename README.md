@@ -18,13 +18,13 @@ On first launch the app creates `Documents\TaskList\backlog.md` from a starter t
 ```markdown
 # Tasks
 
-- [ ] Call the dentist
-- [ ] [P:1] Plan the weekend trip
+- [ ] Fix the flaky login test
+- [ ] [P:1] Ship the 1.2 release
 
-## [Active:true, P:1, Size:M] Home Garden
-[Outcome]: Grow our own vegetables by summer
-- [ ] [Research:true] Compare raised bed kits
-- [x] Buy seeds
+## [Active:true, P:1, Size:M] API Performance
+[Outcome]: p95 latency under 200 ms on every endpoint
+- [ ] [Research:true] Compare Redis and Memcached for caching
+- [x] Add request tracing
 
 ## [Active:false] Side projects
 [Outcome]: Ideas worth keeping for later
