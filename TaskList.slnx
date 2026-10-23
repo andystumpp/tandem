@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TaskList.App/TaskList.App.csproj" />
+    <Project Path="src/TaskList.Core/TaskList.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TaskList.Core.Tests/TaskList.Core.Tests.csproj" />
+  </Folder>
+</Solution>

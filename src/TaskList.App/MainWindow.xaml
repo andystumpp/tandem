@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Window
+    x:Class="TaskList.App.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Tasks"
+    mc:Ignorable="d">
+
+    <!--  Shell: the optional news panel slides out on the left; Root is the task list window itself.  -->
+    <Grid x:Name="Shell">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition x:Name="NewsColumn" Width="0" />
+        <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <!--  Frosted glass: the desktop wallpaper, blurred and lined up with the desktop (WallpaperGlass.cs).  -->
+    <Canvas
+        x:Name="WallpaperLayer"
+        Grid.ColumnSpan="2"
+        IsHitTestVisible="False">
+        <Image x:Name="WallpaperImage" Stretch="Fill" />
+    </Canvas>
+
+    <Grid x:Name="NewsPanel" Visibility="Collapsed" />
+
+    <Grid x:Name="Root" Grid.Column="1">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!--  Only used for screenshots (TASKLIST_PREVIEW_BG=1): stands in for the desktop behind the glass.  -->
+        <Rectangle
+            x:Name="PreviewBackground"
+            Grid.RowSpan="4"
+            Visibility="Collapsed" />
+
+        <!--  Banner themes: a scene across the top that fades into the theme's base color.  -->
+        <Grid
+            x:Name="BannerHost"
+            Grid.RowSpan="4"
+            Height="400"
+            VerticalAlignment="Top"
+            IsHitTestVisible="False"
+            Visibility="Collapsed">
+            <Image
+                x:Name="BackgroundImage"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Stretch="UniformToFill" />
+            <Rectangle x:Name="BannerFade" />
+        </Grid>
+
+        <!--  Colored glow behind the header, drawn on the glass. Colors are set from the theme.  -->
+        <Canvas
+            x:Name="GlowLayer"
+            Grid.RowSpan="4"
+            IsHitTestVisible="False">
+            <Ellipse
+                x:Name="GlowA"
+                Canvas.Left="140"
+                Canvas.Top="-170"
+                Width="420"
+                Height="340" />
+            <Ellipse
+                x:Name="GlowB"
+                Canvas.Left="-160"
+                Canvas.Top="-120"
+                Width="380"
+                Height="280" />
+        </Canvas>
+
+        <!--  Title bar: the AI news ticker sits where a title would be. The pill is a click-through region.  -->
+        <Grid
+            x:Name="AppTitleBar"
+            Height="48"
+            Padding="12,0,0,0"
+            Background="Transparent">
+            <!--  Sized in code to fill the free title-bar space, up to a comfortable reading width.  -->
+            <Button
+                x:Name="NewsPill"
+                MaxWidth="600"
+                Margin="0,0,8,0"
+                VerticalAlignment="Center"
+                Padding="4,3,12,3"
+                HorizontalAlignment="Left"
+                HorizontalContentAlignment="Stretch"
+                Click="OnNewsClick"
+                CornerRadius="14"
+                Visibility="Collapsed">
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border
+                        x:Name="NewsBadge"
+                        Width="22"
+                        Height="22"
+                        CornerRadius="11">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="10"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Text="AI" />
+                    </Border>
+                    <TextBlock
+                        x:Name="NewsText"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        FontSize="13"
+                        TextTrimming="CharacterEllipsis" />
+                    <TextBlock
+                        x:Name="NewsDots"
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        FontSize="9"
+                        CharacterSpacing="200"
+                        Text="•••" />
+                </Grid>
+            </Button>
+        </Grid>
+
+        <!--  Header: title, date, summary, progress ring  -->
+        <Grid
+            Grid.Row="1"
+            Padding="24,4,22,14"
+            ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Spacing="4">
+                <TextBlock
+                    x:Name="TitleText"
+                    FontFamily="Segoe UI Variable Display"
+                    FontSize="26"
+                    LineHeight="32"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap">
+                    <Run x:Name="TitleRun" FontWeight="SemiBold" Text="Tasks" />
+                    <Run x:Name="DateRun" FontWeight="Normal" />
+                </TextBlock>
+                <TextBlock
+                    x:Name="SummaryText"
+                    FontSize="13"
+                    LineHeight="19"
+                    TextWrapping="Wrap">
+                    <Run x:Name="MomentumRun" />
+                    <LineBreak />
+                    <Run x:Name="CountsRun" FontSize="12" />
+                </TextBlock>
+            </StackPanel>
+            <Grid
+                x:Name="RingHost"
+                Grid.Column="1"
+                Width="64"
+                Height="64"
+                Margin="0,4,0,0"
+                VerticalAlignment="Top">
+                <TextBlock
+                    x:Name="PercentText"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontFamily="Segoe UI Variable Display"
+                    FontSize="15"
+                    FontWeight="SemiBold" />
+            </Grid>
+        </Grid>
+
+        <!--  One vertical column: focus, then areas.  -->
+        <ScrollViewer
+            x:Name="MainScroll"
+            Grid.Row="2"
+            Padding="14,0,14,16"
+            VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="ContentPanel" />
+        </ScrollViewer>
+
+        <!--  In-app preview of a research result, over the list. Built in MainWindow.Research.cs.  -->
+        <Grid
+            x:Name="PreviewOverlay"
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            Visibility="Collapsed" />
+
+        <!--  Research-ready banners float bottom-right, just above the footer. Built in MainWindow.Research.cs.  -->
+        <StackPanel
+            x:Name="BannerStack"
+            Grid.Row="2"
+            MaxWidth="360"
+            Margin="16,0,16,10"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Bottom"
+            Spacing="8" />
+
+        <!--  Footer bar  -->
+        <Border
+            x:Name="Footer"
+            Grid.Row="3"
+            Margin="16,0,16,14"
+            Padding="10,4,6,4"
+            BorderThickness="1"
+            CornerRadius="10">
+            <Grid ColumnSpacing="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button
+                    x:Name="FileButton"
+                    Padding="4,4,8,4"
+                    HorizontalAlignment="Left"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Click="OnOpenInEditorClick"
+                    ToolTipService.ToolTip="Open backlog.md in your editor">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon x:Name="FileIcon" FontSize="13" Glyph="&#xE8A5;" />
+                        <TextBlock
+                            x:Name="FileText"
+                            FontSize="12"
+                            Text="backlog.md"
+                            TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </Button>
+                <StackPanel
+                    x:Name="FooterButtons"
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    Spacing="0" />
+            </Grid>
+        </Border>
+    </Grid>
+    </Grid>
+</Window>
